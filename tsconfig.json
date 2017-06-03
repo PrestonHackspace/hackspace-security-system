@@ -1,0 +1,11 @@
+{
+    "version": "2.3.4",
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2017",
+        "strict": true,
+        "noUnusedLocals": true,
+        "sourceMap": false,
+        "outDir": "build"
+    }
+}

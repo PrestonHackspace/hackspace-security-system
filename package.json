@@ -1,0 +1,20 @@
+{
+  "name": "hackspace-security-system",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc && node build/index.js",
+    "lint": "tslint src/**/*.ts",
+    "start": "node build/index.js"
+  },
+  "devDependencies": {
+    "rpi-gpio": "^0.8.1",
+    "tslint": "^5.4.2",
+    "typescript": "^2.3.4"
+  },
+  "dependencies": {
+    "@types/node": "^7.0.27"
+  }
+}
