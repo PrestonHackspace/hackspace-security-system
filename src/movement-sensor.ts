@@ -10,7 +10,7 @@ interface MovementSensor {
 
 const stub = () => void 0;
 
-function MovementSensor(): MovementSensor {
+function NewMovementSensor(): MovementSensor {
   const eventHandlers: Events = {
     movement: stub,
   };
@@ -32,4 +32,4 @@ function MovementSensor(): MovementSensor {
   };
 }
 
-export { MovementSensor };
+export { NewMovementSensor };

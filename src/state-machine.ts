@@ -3,6 +3,7 @@ enum State {
   ARMING,
   ARMED,
   OCCUPIED,
+  PRESOUNDING,
 }
 
 interface Events {
@@ -10,7 +11,10 @@ interface Events {
 }
 
 interface StateMachine {
-  transition(newState: State, member?: string): State;
+  arm(): State;
+  movement(): State;
+  signIn(member: string): State;
+
   getState(): State;
   getMembers(): string[];
 
@@ -19,7 +23,7 @@ interface StateMachine {
 
 const stub = () => void 0;
 
-function StateMachine(): StateMachine {
+function NewStateMachine(): StateMachine {
   let currentState = State.UNARMED;
   const members: string[] = [];
 
@@ -27,38 +31,56 @@ function StateMachine(): StateMachine {
     stateChange: stub,
   };
 
-  function transition(newState: State, member?: string) {
+  function arm(): State {
+    switch (currentState) {
+      case State.ARMING:
+      case State.ARMED:
+      case State.OCCUPIED:
+      case State.PRESOUNDING:
+        return currentState;
+
+      case State.UNARMED:
+        setTimeout(armComplete, 2000);
+
+        return changeState(State.ARMING);
+    }
+  }
+
+  function armComplete() {
     switch (currentState) {
       case State.UNARMED:
-
-        switch (newState) {
-          case State.ARMING:
-            return changeState(newState);
-        }
-
-        break;
+      case State.OCCUPIED:
+      case State.PRESOUNDING:
+      case State.ARMED:
+        return currentState;
 
       case State.ARMING:
-
-        switch (newState) {
-          case State.ARMED:
-            return changeState(newState);
-        }
-
-        break;
-
-      case State.ARMED: {
-
-        switch (newState) {
-          case State.OCCUPIED:
-            return changeState(newState, member);
-        }
-
-        break;
-      }
+        return changeState(State.ARMED);
     }
+  }
 
-    throw new Error(`Invalid transition: ${State[currentState]} => ${State[newState]}`);
+  function movement(): State {
+    switch (currentState) {
+      case State.UNARMED:
+      case State.ARMING:
+      case State.OCCUPIED:
+      case State.PRESOUNDING:
+        return currentState;
+
+      case State.ARMED:
+        return changeState(State.PRESOUNDING)
+    }
+  }
+
+  function signIn(member: string): State {
+    switch (currentState) {
+      case State.UNARMED:
+      case State.ARMING:
+      case State.OCCUPIED:
+      case State.PRESOUNDING:
+      case State.ARMED:
+        return changeState(State.OCCUPIED, member);
+    }
   }
 
   function getState() {
@@ -90,7 +112,9 @@ function StateMachine(): StateMachine {
   }
 
   return {
-    transition,
+    arm,
+    movement,
+    signIn,
     getState,
     getMembers,
     on,
@@ -100,4 +124,5 @@ function StateMachine(): StateMachine {
 export {
   State,
   StateMachine,
+  NewStateMachine,
 };
