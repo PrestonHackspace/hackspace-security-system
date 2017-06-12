@@ -4,6 +4,7 @@ enum State {
   ARMED,
   OCCUPIED,
   PRESOUNDING,
+  SOUNDING,
 }
 
 interface Events {
@@ -37,21 +38,22 @@ function NewStateMachine(): StateMachine {
       case State.ARMED:
       case State.OCCUPIED:
       case State.PRESOUNDING:
+      case State.SOUNDING:
         return currentState;
 
       case State.UNARMED:
         setTimeout(armComplete, 2000);
-
         return changeState(State.ARMING);
     }
   }
 
-  function armComplete() {
+  function armComplete(): State {
     switch (currentState) {
       case State.UNARMED:
       case State.OCCUPIED:
       case State.PRESOUNDING:
       case State.ARMED:
+      case State.SOUNDING:
         return currentState;
 
       case State.ARMING:
@@ -65,22 +67,31 @@ function NewStateMachine(): StateMachine {
       case State.ARMING:
       case State.OCCUPIED:
       case State.PRESOUNDING:
+      case State.SOUNDING:
         return currentState;
 
       case State.ARMED:
-        return changeState(State.PRESOUNDING)
+        setTimeout(preSoundingTimeout, 10000);
+        return changeState(State.PRESOUNDING);
+    }
+  }
+
+  function preSoundingTimeout(): State {
+    switch (currentState) {
+      case State.UNARMED:
+      case State.OCCUPIED:
+      case State.ARMING:
+      case State.ARMED:
+      case State.SOUNDING:
+        return currentState;
+
+      case State.PRESOUNDING:
+        return changeState(State.SOUNDING);
     }
   }
 
   function signIn(member: string): State {
-    switch (currentState) {
-      case State.UNARMED:
-      case State.ARMING:
-      case State.OCCUPIED:
-      case State.PRESOUNDING:
-      case State.ARMED:
-        return changeState(State.OCCUPIED, member);
-    }
+    return changeState(State.OCCUPIED, member);
   }
 
   function getState() {
