@@ -9,6 +9,6 @@ fi
 
 devicepath=$([[ $devline =~ hidraw[0-9] ]] && echo /dev/$BASH_REMATCH)
 
-# sudo chmod 777 $devicepath
+sudo chmod 666 $devicepath
 
 echo $devicepath

@@ -6,6 +6,7 @@
         "strict": true,
         "noUnusedLocals": true,
         "sourceMap": false,
-        "outDir": "build"
+        "outDir": "build",
+        "jsx": "react"
     }
 }
