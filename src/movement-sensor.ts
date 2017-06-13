@@ -1,4 +1,6 @@
-// import gpio = require('rpi-gpio');
+import gpio = require('rpi-gpio');
+
+const Pin = 26;   // PIN NUMBER! (NOT BCM)
 
 interface Events {
   movement(): void;
@@ -15,13 +17,19 @@ function NewMovementSensor(): MovementSensor {
     movement: stub,
   };
 
-  // gpio.on('change', function (channel, value) {
-  //   eventHandlers.movement();
-  // });
+  gpio.on('change', (channel, value) => {
+    if (channel === Pin) eventHandlers.movement();
+  });
 
-  // gpio.setup(7, gpio.DIR_IN, gpio.EDGE_BOTH);
+  gpio.setup(Pin, gpio.DIR_IN, gpio.EDGE_RISING);
 
-  setInterval(() => eventHandlers.movement(), 1000);
+  // setInterval(() => {
+  //   gpio.read(Pin, function (err, value) {
+  //     console.log('The value is ' + value);
+  //   });
+  // }, 1000);
+
+  // setInterval(() => eventHandlers.movement(), 1000);
 
   function on<K extends keyof Events>(eventType: K, handler: Events[K]) {
     eventHandlers[eventType] = handler;

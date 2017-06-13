@@ -3,6 +3,7 @@ import { NewMovementSensor } from './movement-sensor';
 import { NewStateMachine, State } from './state-machine';
 import { NewMembersDb } from './members-db';
 import { NewVoice } from './voice';
+import { NewAutomation } from './automation';
 
 import { NewAdminPanel } from './admin';
 
@@ -11,6 +12,7 @@ const movementSensor = NewMovementSensor();
 const stateMachine = NewStateMachine();
 const membersDb = NewMembersDb();
 const voice = NewVoice();
+const automation = NewAutomation();
 
 NewAdminPanel(membersDb);
 
@@ -25,10 +27,14 @@ stateMachine.on('stateChange', (oldState, newState) => {
 
   if (newState === State.ARMED) {
     voice.speak('Alarm is armed');
+
+    automation.off();
   }
 
   if (newState === State.PRESOUNDING) {
-    voice.speak('Movement detected. Please sign in immediate or alarm will sound');
+    voice.speak('Movement detected. Please sign in immediately or alarm will sound');
+
+    automation.on();
   }
 
   if (newState === State.SOUNDING) {
@@ -36,7 +42,7 @@ stateMachine.on('stateChange', (oldState, newState) => {
 
     alarmInterval = setInterval(() => {
       voice.speak('Intruder alert');
-    }, 3000);
+    }, 5000);
   }
 });
 

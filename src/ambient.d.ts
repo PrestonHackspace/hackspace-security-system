@@ -24,4 +24,22 @@ declare module 'rpi-gpio' {
   function setup(channel: number, direction: DIR, onSetup: () => void): void;
   function setup(channel: number, direction: DIR, edge: EDGE): void;
   function setup(channel: number, direction: DIR, edge: EDGE, onSetup: () => void): void;
+
+  function read(channel: number, callback: (err: Error, value: boolean) => void): void;
+}
+
+declare module 'piswitch' {
+  interface SetupArgs {
+    mode: 'sys' | 'gpio',
+    pulseLength: number,
+    protocol: 1 | 2,
+    /**
+     * Actual pin number on the board
+     */
+    pin: number,
+  }
+
+  function setup(args: SetupArgs): void;
+
+  function send(code: string): void;
 }

@@ -4,16 +4,11 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch & nodemon -w build build/index.js",
     "lint": "tslint src/**/*.ts",
-    "start": "node build/index.js"
+    "start": "ts-node src/index.ts"
   },
   "devDependencies": {
-    "nodemon": "^1.11.0",
-    "rpi-gpio": "^0.8.1",
-    "tslint": "^5.4.2",
-    "typescript": "^2.3.4"
+    "tslint": "^5.4.2"
   },
   "dependencies": {
     "@types/body-parser": "^1.16.3",
@@ -25,7 +20,11 @@
     "express": "^4.15.3",
     "express-react-views": "^0.10.2",
     "fs-extra-promise": "^1.0.1",
+    "piswitch": "^1.2.3",
     "react": "^15.5.4",
-    "react-dom": "^15.5.4"
+    "react-dom": "^15.5.4",
+    "ts-node": "^3.0.6",
+    "rpi-gpio": "^0.8.1",
+    "typescript": "^2.3.4"
   }
 }
