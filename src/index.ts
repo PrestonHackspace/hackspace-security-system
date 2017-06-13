@@ -4,6 +4,7 @@ import { NewStateMachine, State } from './state-machine';
 import { NewMembersDb } from './members-db';
 import { NewVoice } from './voice';
 import { NewAutomation } from './automation';
+import { NewLog } from './log';
 
 import { NewAdminPanel } from './admin';
 
@@ -13,6 +14,7 @@ const stateMachine = NewStateMachine();
 const membersDb = NewMembersDb();
 const voice = NewVoice();
 const automation = NewAutomation();
+const log = NewLog();
 
 NewAdminPanel(membersDb);
 
@@ -28,6 +30,8 @@ stateMachine.on('stateChange', (oldState, newState) => {
   if (newState === State.ARMED) {
     voice.speak('Alarm is armed');
 
+    log.log('Alarm is armed');
+
     automation.off();
   }
 
@@ -40,6 +44,8 @@ stateMachine.on('stateChange', (oldState, newState) => {
   if (newState === State.SOUNDING) {
     voice.speak('Intruder alert');
 
+    log.log('Movement detected!');
+
     alarmInterval = setInterval(() => {
       voice.speak('Intruder alert');
     }, 5000);
@@ -47,6 +53,8 @@ stateMachine.on('stateChange', (oldState, newState) => {
 
   if (newState === State.OCCUPIED) {
     voice.speak('Alarm disarmed');
+
+    log.log('Alarm disarmed');
   }
 });
 
@@ -69,6 +77,8 @@ cardReader.on('cardRead', async (cardId) => {
   const signIn = stateMachine.codePresented(member.cardId);
 
   if (signIn) {
+    log.log(`${member.firstName} ${member.lastName} has entered the hackspace`);
+
     voice.speak(`Welcome to the hackspace ${member.firstName} ${member.lastName}`);
 
     if (cardIds.length) {
@@ -83,8 +93,12 @@ cardReader.on('cardRead', async (cardId) => {
       voice.speak(`${names} ${members.length > 1 ? 'are' : 'is'} also here`);
     }
   } else {
+    log.log(`${member.firstName} ${member.lastName} has left the hackspace`);
+
     voice.speak(`Goodbye ${member.firstName} ${member.lastName}`);
   }
 });
 
 stateMachine.arm();
+
+log.log('System online');
