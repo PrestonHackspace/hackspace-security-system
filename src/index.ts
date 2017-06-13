@@ -44,6 +44,10 @@ stateMachine.on('stateChange', (oldState, newState) => {
       voice.speak('Intruder alert');
     }, 5000);
   }
+
+  if (newState === State.OCCUPIED) {
+    voice.speak('Alarm disarmed');
+  }
 });
 
 movementSensor.on('movement', () => {
@@ -51,6 +55,8 @@ movementSensor.on('movement', () => {
 });
 
 cardReader.on('cardRead', async (cardId) => {
+  console.log('SCAN', cardId);
+
   const member = await membersDb.getByCardId(cardId);
 
   if (!member) {
@@ -58,7 +64,27 @@ cardReader.on('cardRead', async (cardId) => {
     return;
   }
 
-  stateMachine.signIn(member.cardId);
+  const cardIds = stateMachine.getSignedInCardIds();
+
+  const signIn = stateMachine.codePresented(member.cardId);
+
+  if (signIn) {
+    voice.speak(`Welcome to the hackspace ${member.firstName} ${member.lastName}`);
+
+    if (cardIds.length) {
+      const members = await Promise.all(cardIds.map(membersDb.getByCardId));
+
+      const names = members.map((member, index) => {
+        if (!member) return 'Unknown';
+
+        return (members.length > 1 && index === members.length - 1 ? 'and ' : '') + `${member.firstName} ${member.lastName}`;
+      }).join(', ');
+
+      voice.speak(`${names} ${members.length > 1 ? 'are' : 'is'} also here`);
+    }
+  } else {
+    voice.speak(`Goodbye ${member.firstName} ${member.lastName}`);
+  }
 });
 
 stateMachine.arm();

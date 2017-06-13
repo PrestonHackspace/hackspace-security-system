@@ -17,7 +17,7 @@ class AdminIndex extends React.Component<Props, {}> {
           {
             this.props.members.map((member) => {
               return (
-                <li>
+                <li key={member.cardId}>
                   <span>{`${member.firstName} ${member.lastName} ${member.cardId}`}</span>
                 </li>
               );

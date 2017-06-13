@@ -44,6 +44,7 @@ function NewCardReader(): CardReader {
           digit = '0';
         } else if (byte === 40) {
           eventHandlers.cardRead(code.trim());
+          code = '';
         } else {
           digit = String(byte - 29);
         }

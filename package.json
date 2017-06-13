@@ -5,7 +5,9 @@
   "license": "MIT",
   "scripts": {
     "lint": "tslint src/**/*.ts",
-    "start": "ts-node src/index.ts"
+    "start": "node build/index.js",
+    "build": "tsc",
+    "watch": "tsc --watch"
   },
   "devDependencies": {
     "tslint": "^5.4.2"
@@ -23,7 +25,6 @@
     "piswitch": "^1.2.3",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
-    "ts-node": "^3.0.6",
     "rpi-gpio": "^0.8.1",
     "typescript": "^2.3.4"
   }

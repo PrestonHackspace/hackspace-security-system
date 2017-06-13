@@ -14,18 +14,18 @@ function NewAdminPanel(membersDb: MembersDb) {
   app.set('view engine', 'js');
   app.engine('js', require('express-react-views').createEngine());
 
-  app.all('/', (req, res) => {
-    if (req.method === 'POST') {
-      const newMember = req.body as Member;
+  app.get('/', async (req, res) => {
+    const members = await membersDb.getAllMembers();
 
-      membersDb.addMember(newMember);
-    }
+    res.render('index', { members });
+  });
 
-    const members = membersDb.getAllMembers();
+  app.post('/', async (req, res) => {
+    const newMember = req.body as Member;
 
-    members.then((members) => {
-      res.render('index', { members });
-    });
+    await membersDb.addMember(newMember);
+
+    res.redirect('/');
   });
 
   app.listen(3000, () => {

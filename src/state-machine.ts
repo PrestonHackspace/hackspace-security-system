@@ -1,3 +1,5 @@
+const ArmingTime = 2000;
+
 enum State {
   UNARMED,
   ARMING,
@@ -14,10 +16,10 @@ interface Events {
 interface StateMachine {
   arm(): State;
   movement(): State;
-  signIn(member: string): State;
+  codePresented(member: string): boolean;
 
   getState(): State;
-  getMembers(): string[];
+  getSignedInCardIds(): string[];
 
   on<K extends keyof Events>(eventType: K, handler: Events[K]): void;
 }
@@ -26,7 +28,7 @@ const stub = () => void 0;
 
 function NewStateMachine(): StateMachine {
   let currentState = State.UNARMED;
-  const members: string[] = [];
+  const signedInCardIds: string[] = [];
 
   const eventHandlers: Events = {
     stateChange: stub,
@@ -36,13 +38,13 @@ function NewStateMachine(): StateMachine {
     switch (currentState) {
       case State.ARMING:
       case State.ARMED:
-      case State.OCCUPIED:
       case State.PRESOUNDING:
       case State.SOUNDING:
         return currentState;
 
+      case State.OCCUPIED:
       case State.UNARMED:
-        setTimeout(armComplete, 2000);
+        setTimeout(armComplete, ArmingTime);
         return changeState(State.ARMING);
     }
   }
@@ -90,30 +92,54 @@ function NewStateMachine(): StateMachine {
     }
   }
 
-  function signIn(member: string): State {
-    return changeState(State.OCCUPIED, member);
+  function codePresented(cardId: string): boolean {
+    if (signedInCardIds.indexOf(cardId) === -1) {
+      signIn(cardId);
+
+      return true;
+    } else {
+      signOut(cardId);
+
+      return false;
+    }
+  }
+
+  function signIn(cardId: string): State {
+    signedInCardIds.push(cardId);
+
+    if (signedInCardIds.length === 1) {
+      return changeState(State.OCCUPIED);
+    } else {
+      return currentState;
+    }
+  }
+
+  function signOut(cardId: string): State {
+    console.log(signedInCardIds);
+
+    signedInCardIds.splice(signedInCardIds.indexOf(cardId), 1);
+
+    console.log(signedInCardIds);
+
+    if (signedInCardIds.length === 0) {
+      return arm();
+    } else {
+      return currentState;
+    }
   }
 
   function getState() {
     return currentState;
   }
 
-  function getMembers() {
-    return members;
+  function getSignedInCardIds() {
+    return signedInCardIds.slice(0);
   }
 
-  function changeState(newState: State, member?: string) {
+  function changeState(newState: State) {
     console.log(`${State[currentState]} => ${State[newState]}`);
 
     eventHandlers.stateChange(currentState, newState);
-
-    if (newState === State.OCCUPIED) {
-      if (!member) throw new Error('No member specified');
-
-      members.push(member);
-    } else {
-      members.splice(0);
-    }
 
     return currentState = newState;
   }
@@ -125,9 +151,9 @@ function NewStateMachine(): StateMachine {
   return {
     arm,
     movement,
-    signIn,
+    codePresented,
     getState,
-    getMembers,
+    getSignedInCardIds,
     on,
   };
 }

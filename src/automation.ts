@@ -14,7 +14,7 @@ function NewAutomation() {
   function send(code: string) {
     for (let i = 0; i < 20; i += 1) {
       piswitch.send(code);
-      console.log(code, i);
+      // console.log(code, i);
     }
   }
 

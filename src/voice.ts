@@ -4,10 +4,21 @@ import childProcess = require('child_process');
 const SpeechScriptPath = path.join(__dirname, '..', 'speech.sh');
 
 function NewVoice() {
-  function speak(text: string) {
-    console.log('Speak:', text);
+  let promise = Promise.resolve();
 
-    childProcess.spawn(SpeechScriptPath, [text]).toString().trim();
+  function doSpeaking(text: string) {
+    return new Promise<void>((resolve, reject) => {
+      console.log('Speak:', text);
+
+      const proc = childProcess.spawn(SpeechScriptPath, [text]);
+
+      proc.on('close', resolve);
+      proc.on('error', reject);
+    });
+  }
+
+  function speak(text: string) {
+    return promise = promise.then(() => doSpeaking(text));
   }
 
   return {
