@@ -20,15 +20,17 @@ NewAdminPanel(membersDb);
 
 let alarmInterval: NodeJS.Timer | null = null;
 
+let alarmCount = 0;
+
 stateMachine.on('stateChange', (oldState, newState) => {
   if (alarmInterval) clearInterval(alarmInterval);
 
   if (newState === State.ARMING) {
-    voice.speak('Alarm is arming');
+    voice.speak('Alarm is arming', true);
   }
 
   if (newState === State.ARMED) {
-    voice.speak('Alarm is armed');
+    voice.speak('Alarm is armed', true);
 
     log.log('Alarm is armed');
 
@@ -36,7 +38,7 @@ stateMachine.on('stateChange', (oldState, newState) => {
   }
 
   if (newState === State.PRESOUNDING) {
-    voice.speak('Movement detected. Please sign in immediately or alarm will sound');
+    voice.speak('Movement detected. Please sign in immediately or alarm will sound', true);
 
     automation.on();
   }
@@ -46,13 +48,19 @@ stateMachine.on('stateChange', (oldState, newState) => {
 
     log.log('Movement detected!');
 
+    alarmCount = 0;
+
     alarmInterval = setInterval(() => {
+      if (alarmCount >= 10) return;
+
       voice.speak('Intruder alert');
+
+      alarmCount += 1;
     }, 5000);
   }
 
   if (newState === State.OCCUPIED) {
-    voice.speak('Alarm disarmed');
+    voice.speak('Alarm disarmed', true);
 
     log.log('Alarm disarmed');
   }

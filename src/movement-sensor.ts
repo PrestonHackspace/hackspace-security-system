@@ -23,14 +23,6 @@ function NewMovementSensor(): MovementSensor {
 
   gpio.setup(Pin, gpio.DIR_IN, gpio.EDGE_RISING);
 
-  // setInterval(() => {
-  //   gpio.read(Pin, function (err, value) {
-  //     console.log('The value is ' + value);
-  //   });
-  // }, 1000);
-
-  // setInterval(() => eventHandlers.movement(), 1000);
-
   function on<K extends keyof Events>(eventType: K, handler: Events[K]) {
     eventHandlers[eventType] = handler;
   }

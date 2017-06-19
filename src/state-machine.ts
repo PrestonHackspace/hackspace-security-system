@@ -1,4 +1,5 @@
-const ArmingTime = 2000;
+const ArmingTime = 15000;
+const PresoundingTime = 15000;
 
 enum State {
   UNARMED,
@@ -73,7 +74,7 @@ function NewStateMachine(): StateMachine {
         return currentState;
 
       case State.ARMED:
-        setTimeout(preSoundingTimeout, 10000);
+        setTimeout(preSoundingTimeout, PresoundingTime);
         return changeState(State.PRESOUNDING);
     }
   }

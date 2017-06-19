@@ -13,6 +13,7 @@ interface MembersDb {
   getByCardId(cardId: string): Promise<Member | undefined>;
   getAllMembers(): Promise<Member[]>;
   addMember(member: Member): Promise<void>;
+  deleteByCardId(cardId: string): Promise<void>;
 }
 
 function NewMembersDb(): MembersDb {
@@ -49,10 +50,23 @@ function NewMembersDb(): MembersDb {
     return loadData();
   }
 
+  async function deleteByCardId(cardId: string): Promise<void> {
+    const members = await loadData();
+
+    const member = await getByCardId(cardId);
+
+    if (!member) return Promise.reject(new Error(`Member with card ID ${cardId} not found`));
+
+    members.splice(members.indexOf(member), 1);
+
+    return saveData(members);
+  }
+
   return {
     getByCardId,
     getAllMembers,
     addMember,
+    deleteByCardId,
   };
 }
 

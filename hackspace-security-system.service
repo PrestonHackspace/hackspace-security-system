@@ -1,0 +1,12 @@
+[Unit]
+Description=Hackspace Security System
+
+[Service]
+ExecStart=/home/pi/Projects/hackspace-security-system/start.sh
+Restart=always
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/Projects/hackspace-security-system
+
+[Install]
+WantedBy=multi-user.target

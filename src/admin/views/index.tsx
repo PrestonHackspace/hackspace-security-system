@@ -18,6 +18,8 @@ class AdminIndex extends React.Component<Props, {}> {
             this.props.members.map((member) => {
               return (
                 <li key={member.cardId}>
+                  <a href={`/${member.cardId}/delete`}>Delete</a>
+                  &nbsp;
                   <span>{`${member.firstName} ${member.lastName} ${member.cardId}`}</span>
                 </li>
               );
@@ -30,15 +32,21 @@ class AdminIndex extends React.Component<Props, {}> {
         <form method='post'>
           <div>
             <label htmlFor='firstName'>First Name:</label>
-            <input type='text' name='firstName' />
+            <div>
+              <input type='text' name='firstName' />
+            </div>
           </div>
           <div>
             <label htmlFor='firstName'>Last Name:</label>
-            <input type='text' name='lastName' />
+            <div>
+              <input type='text' name='lastName' />
+            </div>
           </div>
           <div>
             <label htmlFor='cardId'>Card ID:</label>
-            <input type='text' name='cardId' />
+            <div>
+              <input type='text' name='cardId' />
+            </div>
           </div>
           <button type='submit'>Add</button>
         </form>

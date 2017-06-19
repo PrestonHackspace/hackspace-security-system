@@ -12,21 +12,21 @@ function NewAutomation() {
   });
 
   function send(code: string) {
-    for (let i = 0; i < 20; i += 1) {
+    for (let i = 0; i < 5; i += 1) {
       piswitch.send(code);
       // console.log(code, i);
     }
   }
 
   function on() {
-    // 001001110000101010000111
-    send('001001110000101010001111');
+    // process.nextTick(() => send('001001110000101010000111'));
+    process.nextTick(() => send('001001110000101010001111'));
   }
 
 
   function off() {
-    // 001001110000101010000110
-    send('001001110000101010001110');
+    // process.nextTick(() => send('001001110000101010000110'));
+    process.nextTick(() => send('001001110000101010001110'));
   }
 
   return {

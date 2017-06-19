@@ -28,6 +28,14 @@ function NewAdminPanel(membersDb: MembersDb) {
     res.redirect('/');
   });
 
+  app.get('/:cardId/delete', async (req, res) => {
+    const { cardId } = req.params;
+
+    await membersDb.deleteByCardId(cardId);
+
+    return res.redirect('/');
+  });
+
   app.listen(3000, () => {
     console.log('Example app listening on port 3000!');
   });
