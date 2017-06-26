@@ -3,6 +3,7 @@ import bodyParser = require('body-parser');
 import { MembersDb, Member } from '../members-db';
 import { AdminIndexProps } from './types';
 import { Config } from '../config';
+import { StateMachine } from '../state-machine';
 
 interface Events {
   swipe(cardNumber: string): void;
@@ -14,7 +15,7 @@ interface AdminPanel {
 
 const stub = () => void 0;
 
-function NewAdminPanel(config: Config, membersDb: MembersDb): AdminPanel {
+function NewAdminPanel(config: Config, membersDb: MembersDb, stateMachine: StateMachine): AdminPanel {
   const eventHandlers: Events = {
     swipe: stub,
   };
@@ -31,10 +32,17 @@ function NewAdminPanel(config: Config, membersDb: MembersDb): AdminPanel {
   app.engine('js', require('express-react-views').createEngine());
 
   app.get('/', async (req, res) => {
-    const members = await membersDb.getAllMembers();
+    const allMembers = await membersDb.getAllMembers();
+
+    const members = allMembers.map((member) => ({
+      ...member,
+      signedIn: stateMachine.getSignedInCardIds().indexOf(member.cardId) !== -1,
+    }));
 
     const mode = config.getEnv();
-    const props: AdminIndexProps = { mode, members };
+    const state = stateMachine.getStateName();
+
+    const props: AdminIndexProps = { mode, state, members };
 
     res.render('index', props);
   });

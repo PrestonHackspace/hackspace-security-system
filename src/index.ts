@@ -20,7 +20,7 @@ async function main() {
   const automation = await NewAutomation(config);
   const log = NewLog(config);
 
-  const panel = NewAdminPanel(config, membersDb);
+  const panel = NewAdminPanel(config, membersDb, stateMachine);
 
   let alarmInterval: NodeJS.Timer | null = null;
 

@@ -19,6 +19,7 @@ interface StateMachine {
   codePresented(member: string): boolean;
 
   getState(): State;
+  getStateName(): string;
   getSignedInCardIds(): string[];
 
   on<K extends keyof Events>(eventType: K, handler: Events[K]): void;
@@ -133,6 +134,10 @@ function NewStateMachine(config: Config): StateMachine {
     return currentState;
   }
 
+  function getStateName() {
+    return State[currentState];
+  }
+
   function getSignedInCardIds() {
     return signedInCardIds.slice(0);
   }
@@ -154,6 +159,7 @@ function NewStateMachine(config: Config): StateMachine {
     movement,
     codePresented,
     getState,
+    getStateName,
     getSignedInCardIds,
     on,
   };

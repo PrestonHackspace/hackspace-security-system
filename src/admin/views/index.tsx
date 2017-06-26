@@ -9,6 +9,8 @@ class AdminIndex extends React.Component<AdminIndexProps, {}> {
 
         <div>Mode of operation: {this.props.mode}</div>
 
+        <div>State: {this.props.state}</div>
+
         <h2>Member list</h2>
 
         <ul>
@@ -20,7 +22,7 @@ class AdminIndex extends React.Component<AdminIndexProps, {}> {
                   &nbsp;
                   <a href={`/${member.cardId}/swipe`}>Swipe</a>
                   &nbsp;
-                  <span>{`${member.firstName} ${member.lastName} ${member.cardId}`}</span>
+                  <span>{`${member.signedIn ? 'IN' : 'OUT'} ${member.firstName} ${member.lastName}`}</span>
                 </li>
               );
             })
