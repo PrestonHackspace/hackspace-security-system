@@ -2,7 +2,21 @@ import express = require('express');
 import bodyParser = require('body-parser');
 import { MembersDb, Member } from '../members-db';
 
-function NewAdminPanel(membersDb: MembersDb) {
+interface Events {
+  swipe(cardNumber: string): void;
+}
+
+interface AdminPanel {
+  on<K extends keyof Events>(eventType: K, handler: Events[K]): void;
+}
+
+const stub = () => void 0;
+
+function NewAdminPanel(membersDb: MembersDb): AdminPanel {
+  const eventHandlers: Events = {
+    swipe: stub,
+  };
+
   const app = express();
 
   app.use(bodyParser.json());
@@ -36,11 +50,28 @@ function NewAdminPanel(membersDb: MembersDb) {
     return res.redirect('/');
   });
 
+  app.get('/:cardId/swipe', async (req, res) => {
+    const { cardId } = req.params;
+
+    eventHandlers.swipe(cardId);
+
+    return res.redirect('/');
+  });
+
   app.listen(3000, () => {
     console.log('Example app listening on port 3000!');
   });
+
+  function on<K extends keyof Events>(eventType: K, handler: Events[K]) {
+    eventHandlers[eventType] = handler;
+  }
+
+  return {
+    on,
+  };
 }
 
 export {
+  AdminPanel,
   NewAdminPanel,
 };

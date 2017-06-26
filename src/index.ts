@@ -7,106 +7,116 @@ import { NewAutomation } from './automation';
 import { NewLog } from './log';
 
 import { NewAdminPanel } from './admin';
+import { NewConfig } from './config';
 
-const cardReader = NewCardReader();
-const movementSensor = NewMovementSensor();
-const stateMachine = NewStateMachine();
-const membersDb = NewMembersDb();
-const voice = NewVoice();
-const automation = NewAutomation();
-const log = NewLog();
+async function main() {
+  const config = NewConfig();
 
-NewAdminPanel(membersDb);
+  const cardReader = NewCardReader();
+  const movementSensor = await NewMovementSensor();
+  const stateMachine = NewStateMachine();
+  const membersDb = NewMembersDb();
+  const voice = NewVoice();
+  const automation = await NewAutomation();
+  const log = NewLog(config);
 
-let alarmInterval: NodeJS.Timer | null = null;
+  const panel = NewAdminPanel(membersDb);
 
-let alarmCount = 0;
+  let alarmInterval: NodeJS.Timer | null = null;
 
-stateMachine.on('stateChange', (oldState, newState) => {
-  if (alarmInterval) clearInterval(alarmInterval);
+  let alarmCount = 0;
 
-  if (newState === State.ARMING) {
-    voice.speak('Alarm is arming', true);
-  }
+  stateMachine.on('stateChange', (oldState, newState) => {
+    if (alarmInterval) clearInterval(alarmInterval);
 
-  if (newState === State.ARMED) {
-    voice.speak('Alarm is armed', true);
+    if (newState === State.ARMING) {
+      voice.speak('Alarm is arming', true);
+    }
 
-    log.log('Alarm is armed');
+    if (newState === State.ARMED) {
+      voice.speak('Alarm is armed', true);
 
-    automation.off();
-  }
+      log.log('Alarm is armed');
 
-  if (newState === State.PRESOUNDING) {
-    voice.speak('Movement detected. Please sign in immediately or alarm will sound', true);
+      automation.off();
+    }
 
-    automation.on();
-  }
+    if (newState === State.PRESOUNDING) {
+      voice.speak('Movement detected. Please sign in immediately or alarm will sound', true);
 
-  if (newState === State.SOUNDING) {
-    voice.speak('Intruder alert');
+      automation.on();
+    }
 
-    log.log('Movement detected!');
-
-    alarmCount = 0;
-
-    alarmInterval = setInterval(() => {
-      if (alarmCount >= 10) return;
-
+    if (newState === State.SOUNDING) {
       voice.speak('Intruder alert');
 
-      alarmCount += 1;
-    }, 5000);
-  }
+      log.log('Movement detected!');
 
-  if (newState === State.OCCUPIED) {
-    voice.speak('Alarm disarmed', true);
+      alarmCount = 0;
 
-    log.log('Alarm disarmed');
-  }
-});
+      alarmInterval = setInterval(() => {
+        if (alarmCount >= 10) return;
 
-movementSensor.on('movement', () => {
-  stateMachine.movement();
-});
+        voice.speak('Intruder alert');
 
-cardReader.on('cardRead', async (cardId) => {
-  console.log('SCAN', cardId);
-
-  const member = await membersDb.getByCardId(cardId);
-
-  if (!member) {
-    voice.speak('Invalid card detected, please register this card');
-    return;
-  }
-
-  const cardIds = stateMachine.getSignedInCardIds();
-
-  const signIn = stateMachine.codePresented(member.cardId);
-
-  if (signIn) {
-    log.log(`${member.firstName} ${member.lastName} has entered the hackspace`);
-
-    voice.speak(`Welcome to the hackspace ${member.firstName} ${member.lastName}`);
-
-    if (cardIds.length) {
-      const members = await Promise.all(cardIds.map(membersDb.getByCardId));
-
-      const names = members.map((member, index) => {
-        if (!member) return 'Unknown';
-
-        return (members.length > 1 && index === members.length - 1 ? 'and ' : '') + `${member.firstName} ${member.lastName}`;
-      }).join(', ');
-
-      voice.speak(`${names} ${members.length > 1 ? 'are' : 'is'} also here`);
+        alarmCount += 1;
+      }, 5000);
     }
-  } else {
-    log.log(`${member.firstName} ${member.lastName} has left the hackspace`);
 
-    voice.speak(`Goodbye ${member.firstName} ${member.lastName}`);
+    if (newState === State.OCCUPIED) {
+      voice.speak('Alarm disarmed', true);
+
+      log.log('Alarm disarmed');
+    }
+  });
+
+  movementSensor.on('movement', () => {
+    stateMachine.movement();
+  });
+
+  cardReader.on('cardRead', swipe);
+  panel.on('swipe', swipe);
+
+  stateMachine.arm();
+
+  log.log('System online');
+
+  async function swipe(cardId: string) {
+    console.log('SCAN', cardId);
+
+    const member = await membersDb.getByCardId(cardId);
+
+    if (!member) {
+      voice.speak('Invalid card detected, please register this card');
+      return;
+    }
+
+    const cardIds = stateMachine.getSignedInCardIds();
+
+    const signIn = stateMachine.codePresented(member.cardId);
+
+    if (signIn) {
+      log.log(`${member.firstName} ${member.lastName} has entered the hackspace`);
+
+      voice.speak(`Welcome to the hackspace ${member.firstName} ${member.lastName}`);
+
+      if (cardIds.length) {
+        const members = await Promise.all(cardIds.map(membersDb.getByCardId));
+
+        const names = members.map((member, index) => {
+          if (!member) return 'Unknown';
+
+          return (members.length > 1 && index === members.length - 1 ? 'and ' : '') + `${member.firstName} ${member.lastName}`;
+        }).join(', ');
+
+        voice.speak(`${names} ${members.length > 1 ? 'are' : 'is'} also here`);
+      }
+    } else {
+      log.log(`${member.firstName} ${member.lastName} has left the hackspace`);
+
+      voice.speak(`Goodbye ${member.firstName} ${member.lastName}`);
+    }
   }
-});
+}
 
-stateMachine.arm();
-
-log.log('System online');
+main();

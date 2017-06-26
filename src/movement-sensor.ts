@@ -1,5 +1,3 @@
-import gpio = require('rpi-gpio');
-
 const Pin = 26;   // PIN NUMBER! (NOT BCM)
 
 interface Events {
@@ -12,16 +10,20 @@ interface MovementSensor {
 
 const stub = () => void 0;
 
-function NewMovementSensor(): MovementSensor {
+async function NewMovementSensor(): Promise<MovementSensor> {
   const eventHandlers: Events = {
     movement: stub,
   };
 
-  gpio.on('change', (channel, value) => {
-    if (channel === Pin) eventHandlers.movement();
-  });
+  if (process.platform === 'linux') {
+    const gpio = await import('rpi-gpio');
 
-  gpio.setup(Pin, gpio.DIR_IN, gpio.EDGE_RISING);
+    gpio.on('change', (channel, value) => {
+      if (channel === Pin) eventHandlers.movement();
+    });
+
+    gpio.setup(Pin, gpio.DIR_IN, gpio.EDGE_RISING);
+  }
 
   function on<K extends keyof Events>(eventType: K, handler: Events[K]) {
     eventHandlers[eventType] = handler;

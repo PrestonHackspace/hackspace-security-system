@@ -27,32 +27,34 @@ function NewCardReader(): CardReader {
     dev = null;
   }
 
-  if (!dev) throw new Error('Card reader not available');
+  if (dev) {
+    const input = fs.createReadStream(dev);
 
-  const input = fs.createReadStream(dev);
+    let code = '';
 
-  let code = '';
+    input.on('data', function (chunk: Buffer) {
+      for (let i = 0; i < chunk.byteLength; i += 1) {
+        const byte = chunk[i];
 
-  input.on('data', function (chunk: Buffer) {
-    for (let i = 0; i < chunk.byteLength; i += 1) {
-      const byte = chunk[i];
+        if (byte !== 0) {
+          let digit = '';
 
-      if (byte !== 0) {
-        let digit = '';
+          if (byte === 39) {
+            digit = '0';
+          } else if (byte === 40) {
+            eventHandlers.cardRead(code.trim());
+            code = '';
+          } else {
+            digit = String(byte - 29);
+          }
 
-        if (byte === 39) {
-          digit = '0';
-        } else if (byte === 40) {
-          eventHandlers.cardRead(code.trim());
-          code = '';
-        } else {
-          digit = String(byte - 29);
+          code += digit;
         }
-
-        code += digit;
       }
-    }
-  });
+    });
+  } else {
+    console.warn('Card reader not available');
+  }
 
   function on<K extends keyof Events>(eventType: K, handler: Events[K]) {
     eventHandlers[eventType] = handler;

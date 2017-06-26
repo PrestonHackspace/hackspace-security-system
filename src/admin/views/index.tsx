@@ -20,7 +20,10 @@ class AdminIndex extends React.Component<Props, {}> {
                 <li key={member.cardId}>
                   <a href={`/${member.cardId}/delete`}>Delete</a>
                   &nbsp;
+                  <a href={`/${member.cardId}/swipe`}>Swipe</a>
+                  &nbsp;
                   <span>{`${member.firstName} ${member.lastName} ${member.cardId}`}</span>
+
                 </li>
               );
             })

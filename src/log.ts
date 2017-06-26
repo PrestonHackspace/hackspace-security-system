@@ -1,14 +1,16 @@
-import Slack = require('node-slack');
+import { Config } from './config';
 
-const HookUrl = 'https://hooks.slack.com/services/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';
+function NewLog(config: Config) {
+  const Slack = require('node-slack');
 
-const slack = new Slack(HookUrl);
+  const slack = new Slack(config.getSlackHookUrl());
 
-function NewLog() {
   function log(text: string) {
-    slack.send({
-      text,
-    });
+    if (config.getEnv() === 'production') {
+      slack.send({
+        text,
+      });
+    }
   }
 
   return {
