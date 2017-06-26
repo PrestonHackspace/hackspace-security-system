@@ -2,5 +2,29 @@
 {
   "editor.tabSize": 2,
   "prettier.tabWidth": 2,
-  "editor.insertSpaces": true
+  "editor.insertSpaces": true,
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "/config.json",
+        "/config.sample.json"
+      ],
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "definitions": {},
+        "id": "http://example.com/example.json",
+        "properties": {
+          "slackHookUrl": {
+            "id": "/properties/slackHookUrl",
+            "type": "string"
+          },
+          "alarmSoundCount": {
+            "id": "/properties/alarmSoundCount",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    }
+  ]
 }

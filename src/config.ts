@@ -1,20 +1,31 @@
-interface Config {
+import fs = require('fs');
+import path = require('path');
+
+interface ConfigJson {
+  slackHookUrl: string;
+  alarmSoundCount: number;
+}
+
+interface Config extends ConfigJson {
   getEnv(): 'production' | 'test';
-  getSlackHookUrl():string;
 }
 
 function NewConfig(): Config {
+  const configPath = path.join(__dirname, '..', 'config.json');
+
+  if (!fs.existsSync(configPath)) {
+    throw new Error('Config file not present. Please see README.md');
+  }
+
+  const configJson: ConfigJson = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
   function getEnv() {
     return process.env.ENV;
   }
 
-  function getSlackHookUrl() {
-    return 'https://hooks.slack.com/services/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';
-  }
-
   return {
+    ...configJson,
     getEnv,
-    getSlackHookUrl,
   };
 }
 

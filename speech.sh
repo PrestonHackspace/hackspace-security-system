@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ "$OSTYPE" == "linux-gnu" ]]; then
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   md5=$(echo $1 | md5sum | awk '{ print $1 }')
 
   if [ ! -f /tmp/$md5.wav ]; then

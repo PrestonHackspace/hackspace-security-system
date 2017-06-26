@@ -1,5 +1,7 @@
-async function NewAutomation() {
-  if (process.platform === 'linux') {
+import { Config } from './config';
+
+async function NewAutomation(config: Config) {
+  if (process.platform === 'linux' && config.getEnv() === 'production') {
     const piswitch = await import('piswitch');
     const childProcess = await import('child_process');
 
@@ -36,8 +38,8 @@ async function NewAutomation() {
     };
   } else {
     return {
-      on() { },
-      off() { },
+      on() { console.log('Lights ON'); },
+      off() { console.log('Lights OFF'); },
     };
   }
 }

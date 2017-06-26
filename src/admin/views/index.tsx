@@ -1,15 +1,13 @@
 import React = require('react');
-import { Member } from '../../members-db';
+import { AdminIndexProps } from '../types';
 
-interface Props {
-  members: Member[];
-}
-
-class AdminIndex extends React.Component<Props, {}> {
+class AdminIndex extends React.Component<AdminIndexProps, {}> {
   render() {
     return (
       <div>
         <h1>Security access panel</h1>
+
+        <div>Mode of operation: {this.props.mode}</div>
 
         <h2>Member list</h2>
 
@@ -23,7 +21,6 @@ class AdminIndex extends React.Component<Props, {}> {
                   <a href={`/${member.cardId}/swipe`}>Swipe</a>
                   &nbsp;
                   <span>{`${member.firstName} ${member.lastName} ${member.cardId}`}</span>
-
                 </li>
               );
             })

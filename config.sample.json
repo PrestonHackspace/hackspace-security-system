@@ -1,0 +1,5 @@
+// Copy to "config.json" and ensure values are correct...
+{
+  "slackHookUrl": "[Slack hook url here or delete to disable]",
+  "alarmSoundCount": 10
+}

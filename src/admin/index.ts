@@ -1,6 +1,8 @@
 import express = require('express');
 import bodyParser = require('body-parser');
 import { MembersDb, Member } from '../members-db';
+import { AdminIndexProps } from './types';
+import { Config } from '../config';
 
 interface Events {
   swipe(cardNumber: string): void;
@@ -12,7 +14,7 @@ interface AdminPanel {
 
 const stub = () => void 0;
 
-function NewAdminPanel(membersDb: MembersDb): AdminPanel {
+function NewAdminPanel(config: Config, membersDb: MembersDb): AdminPanel {
   const eventHandlers: Events = {
     swipe: stub,
   };
@@ -31,7 +33,10 @@ function NewAdminPanel(membersDb: MembersDb): AdminPanel {
   app.get('/', async (req, res) => {
     const members = await membersDb.getAllMembers();
 
-    res.render('index', { members });
+    const mode = config.getEnv();
+    const props: AdminIndexProps = { mode, members };
+
+    res.render('index', props);
   });
 
   app.post('/', async (req, res) => {

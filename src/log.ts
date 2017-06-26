@@ -1,23 +1,32 @@
 import { Config } from './config';
 
-function NewLog(config: Config) {
-  const Slack = require('node-slack');
+interface Log {
+  log(text: string): void;
+}
 
-  const slack = new Slack(config.getSlackHookUrl());
+function NewLog(config: Config): Log {
+  const url = config.slackHookUrl;
 
-  function log(text: string) {
-    if (config.getEnv() === 'production') {
-      slack.send({
-        text,
-      });
+  if (url && config.getEnv() === 'production') {
+    const Slack = require('node-slack');
+
+    const slack = new Slack(url);
+
+    function log(text: string) {
+      slack.send({ text });
     }
-  }
 
-  return {
-    log,
-  };
+    return {
+      log,
+    };
+  } else {
+    return {
+      log(text) { console.log('Log:', text); },
+    };
+  }
 }
 
 export {
+  Log,
   NewLog,
 };

@@ -17,10 +17,10 @@ async function main() {
   const stateMachine = NewStateMachine();
   const membersDb = NewMembersDb();
   const voice = NewVoice();
-  const automation = await NewAutomation();
+  const automation = await NewAutomation(config);
   const log = NewLog(config);
 
-  const panel = NewAdminPanel(membersDb);
+  const panel = NewAdminPanel(config, membersDb);
 
   let alarmInterval: NodeJS.Timer | null = null;
 
@@ -55,7 +55,7 @@ async function main() {
       alarmCount = 0;
 
       alarmInterval = setInterval(() => {
-        if (alarmCount >= 10) return;
+        if (alarmCount >= config.alarmSoundCount) return;
 
         voice.speak('Intruder alert');
 
@@ -67,6 +67,8 @@ async function main() {
       voice.speak('Alarm disarmed', true);
 
       log.log('Alarm disarmed');
+
+      automation.on();
     }
   });
 
