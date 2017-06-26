@@ -4,6 +4,8 @@ import path = require('path');
 interface ConfigJson {
   slackHookUrl: string;
   alarmSoundCount: number;
+  armingTime: number;
+  presoundingTime: number;
 }
 
 interface Config extends ConfigJson {

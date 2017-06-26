@@ -14,7 +14,7 @@ async function main() {
 
   const cardReader = NewCardReader();
   const movementSensor = await NewMovementSensor();
-  const stateMachine = NewStateMachine();
+  const stateMachine = NewStateMachine(config);
   const membersDb = NewMembersDb();
   const voice = NewVoice();
   const automation = await NewAutomation(config);
@@ -55,7 +55,9 @@ async function main() {
       alarmCount = 0;
 
       alarmInterval = setInterval(() => {
-        if (alarmCount >= config.alarmSoundCount) return;
+        if (alarmCount >= config.alarmSoundCount - 1) {
+          return stateMachine.arm();
+        }
 
         voice.speak('Intruder alert');
 

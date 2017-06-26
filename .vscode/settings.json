@@ -21,8 +21,21 @@
           "alarmSoundCount": {
             "id": "/properties/alarmSoundCount",
             "type": "integer"
+          },
+          "armingTime": {
+            "id": "/properties/armingTime",
+            "type": "integer"
+          },
+          "presoundingTime": {
+            "id": "/properties/presoundingTime",
+            "type": "integer"
           }
         },
+        "required":[
+          "alarmSoundCount",
+          "armingTime",
+          "presoundingTime"
+        ],
         "type": "object"
       }
     }

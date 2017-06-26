@@ -1,5 +1,4 @@
-const ArmingTime = 15000;
-const PresoundingTime = 15000;
+import { Config } from './config';
 
 enum State {
   UNARMED,
@@ -27,7 +26,7 @@ interface StateMachine {
 
 const stub = () => void 0;
 
-function NewStateMachine(): StateMachine {
+function NewStateMachine(config: Config): StateMachine {
   let currentState = State.UNARMED;
   const signedInCardIds: string[] = [];
 
@@ -40,12 +39,13 @@ function NewStateMachine(): StateMachine {
       case State.ARMING:
       case State.ARMED:
       case State.PRESOUNDING:
-      case State.SOUNDING:
         return currentState;
 
+      case State.SOUNDING:
       case State.OCCUPIED:
       case State.UNARMED:
-        setTimeout(armComplete, ArmingTime);
+        setTimeout(armComplete, config.armingTime);
+        signedInCardIds.splice(0);
         return changeState(State.ARMING);
     }
   }
@@ -74,7 +74,7 @@ function NewStateMachine(): StateMachine {
         return currentState;
 
       case State.ARMED:
-        setTimeout(preSoundingTimeout, PresoundingTime);
+        setTimeout(preSoundingTimeout, config.presoundingTime);
         return changeState(State.PRESOUNDING);
     }
   }
